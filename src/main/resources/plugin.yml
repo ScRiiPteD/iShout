@@ -6,3 +6,10 @@ main: me.gaioli.plugins.ishout.Ishout
 name: iShout
 startup: postworld
 version: '1.0'
+commands:
+  ishout:
+    description: Main command for shouting
+    usage: /ishout <arguments>
+  shout:
+    description: Shout to the server
+    usage: /shout <message>

@@ -37,7 +37,8 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
         log("Loading iShout v"+version);
         shoutingEnabled = true;
         log("Initializing Commands...");
-        
+        getCommand("shout").setExecutor(this);
+        getCommand("ishout").setExecutor(this);
     }
     
     public void log(String message){
