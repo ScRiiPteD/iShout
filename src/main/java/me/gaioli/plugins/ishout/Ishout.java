@@ -21,6 +21,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
     public int currentVer = 1;
     public int currentSubVer = 0;
     public Map<Player, Boolean> hasShouted = new HashMap<Player, Boolean>();
+    public boolean shoutingEnabled;
     
     @Override
     public void onDisable() {
@@ -34,6 +35,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
         version = description.getVersion();
         prefix = "["+description.getName()+"] ";
         log("Loading iShout v"+version);
+        shoutingEnabled = true;
         log("Initializing Commands...");
         
     }
@@ -69,6 +71,25 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"================");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout on - Allow shouting (Req. Perm)");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout off - Turns off shouting (Req. Perm)");
+            } else if (args.length >= 1 && args[0].equalsIgnoreCase("on")) {
+                if (shoutingEnabled == false && player.hasPermission("ishout.toggle")) {
+                    player.sendMessage(ChatColor.LIGHT_PURPLE+"Turning Shouting ON");
+                    shoutingEnabled = true;
+                    shoutStatus(shoutingEnabled, server, player);
+                    return true;
+                } else if (shoutingEnabled == true && player.hasPermission("ishout.toggle")) {
+                    player.sendMessage(ChatColor.LIGHT_PURPLE+"Shouting Already Enabled!");
+                    return true;
+                } else if(!player.hasPermission("ishout.toggle")) {
+                    player.sendMessage(ChatColor.RED+"You do not have permission to toggle shout!");
+                }
+            } else if (args.length >= 1 && args[0].equalsIgnoreCase("off")) {
+                if (shoutingEnabled == true && player.hasPermission("ishout.toggle")) {
+                    player.sendMessage(ChatColor.LIGHT_PURPLE+"Turning Shouting OFF");
+                    shoutingEnabled = false;
+                    shoutStatus(shoutingEnabled, server, player);
+                    return true;
+                }
             } else {
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"====iShout====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"==== v"+version+" ====");
@@ -91,14 +112,28 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
         return false;
     }
     
+    public void shoutStatus(boolean status, Server server, Player player) {
+        if(status == true) {
+            server.broadcastMessage(ChatColor.YELLOW+player.getPlayerListName()+" changed shouting status to: ON");
+            log(player.getPlayerListName()+" Allowed Shouting");
+        } else if (status == false) {
+            server.broadcastMessage(ChatColor.YELLOW+player.getPlayerListName()+" changed shouting status to: OFF");
+            log(player.getPlayerListName()+" Disallowed Shouting");
+        }
+    }
+    
     public void shout(Player player, String msg) {
         Server server = Bukkit.getServer();
+        if (shoutingEnabled == false) {
+            player.sendMessage(ChatColor.RED+"Shouting is currently disabled!");
+            return;
+        }
         if (msg.isEmpty()) {
             player.sendMessage(ChatColor.RED+"You must type a message to shout!");
             return;
         }
-        if (!hasShouted.containsKey(player) && player.hasPermission("dc.shout")) {
-            if (player.hasPermission("dc.color")) {
+        if (!hasShouted.containsKey(player) && player.hasPermission("ishout.shout")) {
+            if (player.hasPermission("ishout.color")) {
                 server.broadcastMessage(ChatColor.RED+"[S]"+ChatColor.WHITE+player.getDisplayName()+ChatColor.GRAY+": "+replaceColors(msg));
                 hasShouted.put(player, true);
                 setTimer(player);
@@ -107,8 +142,8 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
                 hasShouted.put(player, true);
                 setTimer(player);
             }
-        } else if (player.hasPermission("dc.shout.bypass")) {
-            if (player.hasPermission("dc.color")) {
+        } else if (player.hasPermission("ishout.shout.bypass")) {
+            if (player.hasPermission("ishout.color")) {
                 server.broadcastMessage(ChatColor.RED+"[S]"+ChatColor.WHITE+player.getDisplayName()+ChatColor.GRAY+": "+replaceColors(msg));
             } else {
                 server.broadcastMessage(ChatColor.RED+"[S]"+ChatColor.WHITE+player.getDisplayName()+ChatColor.GRAY+": "+msg);
@@ -116,7 +151,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
         } else if (hasShouted.containsKey(player)) {
             player.sendMessage(ChatColor.RED+"Sorry you must wait 1 minute from when you last shouted to shout!");
         } else {
-            if (player.hasPermission("dc.color")) {
+            if (player.hasPermission("ishout.color")) {
                 server.broadcastMessage(ChatColor.RED+"[S]"+ChatColor.WHITE+player.getDisplayName()+ChatColor.GRAY+": "+replaceColors(msg));
                 hasShouted.put(player, true);
             } else {
