@@ -22,6 +22,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
     public int currentSubVer = 0;
     public Map<Player, Boolean> hasShouted = new HashMap<Player, Boolean>();
     public boolean shoutingEnabled;
+    public Player recentConroler;
     
     @Override
     public void onDisable() {
@@ -51,7 +52,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
         Server server = Bukkit.getServer();
         if (cmd.getName().equalsIgnoreCase("ishout")) {
             if (args.length == 0) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iShout====");
+                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iCanShout====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"==== v"+version+" ====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"================");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"Commands: ");
@@ -59,7 +60,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout [argument] (Type /ishout help arguments for arguments)");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout help - Shows this page");
             } else if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iShout====");
+                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iCanShout====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"==== v"+version+" ====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"================");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"Commands: ");
@@ -67,7 +68,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout [argument] (Type /ishout help arguments for arguments)");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout help - Shows this page");
             } else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("arguments")) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iShout====");
+                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iCanShout====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"==== v"+version+" ====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"================");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"/ishout on - Allow shouting (Req. Perm)");
@@ -92,7 +93,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
                     return true;
                 }
             } else {
-                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iShout====");
+                player.sendMessage(ChatColor.LIGHT_PURPLE+"====iCanShout====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"==== v"+version+" ====");
                 player.sendMessage(ChatColor.LIGHT_PURPLE+"================");
                 player.sendMessage("");
@@ -117,16 +118,20 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
         if(status == true) {
             server.broadcastMessage(ChatColor.YELLOW+player.getPlayerListName()+" changed shouting status to: ON");
             log(player.getPlayerListName()+" Allowed Shouting");
+            this.shoutingEnabled = true;
+            this.recentConroler = player;
         } else if (status == false) {
             server.broadcastMessage(ChatColor.YELLOW+player.getPlayerListName()+" changed shouting status to: OFF");
             log(player.getPlayerListName()+" Disallowed Shouting");
+            this.shoutingEnabled = false;
+            this.recentConroler = player;
         }
     }
     
     public void shout(Player player, String msg) {
         Server server = Bukkit.getServer();
-        if (shoutingEnabled == false) {
-            player.sendMessage(ChatColor.RED+"Shouting is currently disabled!");
+        if (this.shoutingEnabled == false) {
+            player.sendMessage(ChatColor.RED+"Shouting is currently disabled by: "+this.recentConroler.getPlayerListName());
             return;
         }
         if (msg.isEmpty()) {
@@ -172,7 +177,7 @@ public class Ishout extends JavaPlugin implements CommandExecutor{
     }
     
     private String replaceColors (String message) {
-	return message.replaceAll("&([o-9a-z])", "\u00A7$1");
+	return message.replaceAll("(?i)&([a-f0-9])", "\u00A7$1");
     }
 }
 

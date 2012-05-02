@@ -3,7 +3,7 @@ database: false
 description: Shout to your server
 generator: http://dinnerbone.com/minecraft/tools/pluginator/
 main: me.gaioli.plugins.ishout.Ishout
-name: iShout
+name: iCanShout
 startup: postworld
 version: '1.0'
 commands:
